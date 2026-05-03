@@ -230,8 +230,10 @@
 #endif
 
 #ifndef SYSCF
+#ifndef ANDROID
 #define SYSCF                /* use a global configuration */
 #define SYSCF_FILE "sysconf" /* global configuration is in a file */
+#endif
 #endif
 
 #ifndef GDBPATH

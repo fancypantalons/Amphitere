@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "widgets": [
+    {
+      "type": "status",
+      "anchor": {
+        "horizontal": "LEFT",
+        "vertical": "TOP",
+        "marginLeft": "8dp",
+        "marginRight": "8dp",
+        "marginTop": "0dp"
+      },
+      "size": {
+        "width": "MATCH_PARENT",
+        "height": "64dp"
+      },
+      "properties": {
+        "opacity": 255,
+        "fontSize": 16
+      }
+    },
+    {
+      "type": "minimap",
+      "anchor": {
+        "horizontal": "RIGHT",
+        "vertical": "BOTTOM",
+        "marginRight": "10dp",
+        "marginBottom": "10dp"
+      },
+      "size": {
+        "width": "240dp",
+        "height": "60dp"
+      },
+      "properties": {
+        "opacity": 255
+      }
+    }
+  ]
+}

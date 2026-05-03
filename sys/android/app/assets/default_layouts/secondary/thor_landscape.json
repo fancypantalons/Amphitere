@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "widgets": [
+    {
+      "type": "message",
+      "anchor": {
+        "horizontal": "LEFT",
+        "vertical": "TOP",
+        "marginLeft": "8dp",
+        "marginRight": "8dp",
+        "marginTop": "0dp"
+      },
+      "size": {
+        "width": "MATCH_PARENT",
+        "height": "120dp"
+      },
+      "properties": {
+        "opacity": 255,
+        "fontSize": 18,
+        "rows": 3
+      }
+    },
+    {
+      "type": "command_palette",
+      "anchor": {
+        "horizontal": "LEFT",
+        "vertical": "TOP",
+        "marginLeft": "8dp",
+        "marginRight": "8dp",
+        "marginTop": "120dp"
+      },
+      "size": {
+        "width": "MATCH_PARENT",
+        "height": "MATCH_PARENT"
+      },
+      "properties": {
+        "opacity": 255,
+        "fontSize": 18,
+        "horizontal": false,
+        "columns": 4,
+        "contextualOnly": false
+      }
+    }
+  ]
+}

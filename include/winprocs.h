@@ -19,6 +19,9 @@ enum wp_ids { wp_tty = 1, wp_X11, wp_Qt, wp_mswin, wp_curses,
 #ifdef OUTDATED_STUFF
               wp_mac, wp_Gem, wp_Gnome,
 #endif
+#ifdef ANDROID_GRAPHICS
+              wp_android,
+#endif
               wp_trace  // XXX do we need this?  should chainin/out get an id? TBD
 };
 

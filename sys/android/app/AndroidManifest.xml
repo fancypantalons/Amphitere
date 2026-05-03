@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:installLocation="auto">
+	<uses-sdk />
+	<uses-permission
+		android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+	<application
+		android:label="NetHack"
+		android:icon="@drawable/icon"
+		android:largeHeap="true"
+		android:theme="@style/Theme.ForkFront"		android:allowBackup="true"
+		android:extractNativeLibs="false">
+		<activity
+			android:name="com.tbd.forkfront.ForkFront"
+			android:label="NetHack"
+			android:exported="true"
+			android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+			android:launchMode="singleTop"
+			android:configChanges="mcc|mnc|locale|keyboard|keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|fontScale">
+			<!-- Prevent activity from restarting when configuration changes -->
+			<intent-filter>
+				<action
+					android:name="android.intent.action.MAIN"/>
+				<category
+					android:name="android.intent.category.LAUNCHER"/>
+			</intent-filter>
+		</activity>
+		<activity
+			android:name="com.tbd.forkfront.settings.Settings"
+			android:label="NetHack Settings"
+			android:parentActivityName="com.tbd.forkfront.ForkFront"
+			android:exported="true">
+			<meta-data
+				android:name="android.support.PARENT_ACTIVITY"
+				android:value="com.tbd.forkfront.ForkFront" />
+		</activity>
+	</application>
+</manifest>

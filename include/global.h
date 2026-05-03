@@ -180,6 +180,10 @@ typedef uchar nhsym;
 #include "amiconf.h"
 #endif
 
+#ifdef ANDROID
+#include "androidconf.h"
+#endif
+
 /* Displayable name of this port; don't redefine if defined in *conf.h */
 #ifndef PORT_ID
 #ifdef AMIGA

@@ -1,0 +1,9 @@
+bin
+libs/*
+app/libs/*
+app/assets/nethackdir
+gen
+.gradle
+build
+app/build
+local.properties

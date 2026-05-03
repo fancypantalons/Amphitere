@@ -7,3 +7,6 @@
 [submodule "submodules/pdcursesmod"]
 	path = submodules/pdcursesmod
 	url = https://github.com/Bill-Gray/PDCursesMod.git
+[submodule "sys/android/forkfront"]
+	path = sys/android/forkfront
+	url = git@github.com:fancypantalons/ForkFront-Android-NG.git

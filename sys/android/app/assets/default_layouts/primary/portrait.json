@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "widgets": [
+    {
+      "type": "status",
+      "anchor": {
+        "horizontal": "CENTER",
+        "vertical": "TOP",
+        "marginLeft": "15dp",
+        "marginRight": "15dp",
+        "marginTop": "0dp"
+      },
+      "size": {
+        "width": "MATCH_PARENT",
+        "height": "75dp"
+      },
+      "properties": {
+        "opacity": 191,
+        "fontSize": 15
+      }
+    },
+    {
+      "type": "message",
+      "anchor": {
+        "horizontal": "CENTER",
+        "vertical": "TOP",
+        "marginLeft": "15dp",
+        "marginRight": "15dp",
+        "marginTop": "75dp"
+      },
+      "size": {
+        "width": "MATCH_PARENT",
+        "height": "100dp"
+      },
+      "properties": {
+        "opacity": 191,
+        "fontSize": 15
+      }
+    },
+    {
+      "type": "command_palette",
+      "anchor": {
+        "horizontal": "CENTER",
+        "vertical": "BOTTOM",
+        "marginLeft": "15dp",
+        "marginRight": "15dp",
+        "marginBottom": "0dp"
+      },
+      "size": {
+        "width": "MATCH_PARENT",
+        "height": "25%"
+      },
+      "properties": {
+        "opacity": 191,
+        "fontSize": 15,
+        "horizontal": false,
+        "columns": 4,
+        "contextualOnly": true,
+        "pinnedCommands": [
+          "s",
+          "e",
+          "#loot",
+          "i",
+          "q",
+          "r",
+          "w",
+          "W",
+          "a",
+          "t",
+          "Z",
+          "#pray"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+# NetHack 5.0  android.500
+# Android NDK cross-compilation hints file.
+# Produces libnethack.so for use with the ForkFront Java UI layer.
+
+#-PRE
+# Use NDK's clang cross-compiler.
+# Adjust TARGET and API level as needed.
+TARGET = aarch64-linux-android
+API = 21
+NDK_HOST = linux-x86_64
+TOOLCHAIN = $(ANDROID_NDK_ROOT)/toolchains/llvm/prebuilt/$(NDK_HOST)
+
+CC = $(TOOLCHAIN)/bin/$(TARGET)$(API)-clang
+CXX = $(TOOLCHAIN)/bin/$(TARGET)$(API)-clang++
+LD = $(CC)
+AR = $(TOOLCHAIN)/bin/llvm-ar rcs
+RANLIB = $(TOOLCHAIN)/bin/llvm-ranlib
+
+# Target-specific prefixes for NetHack build system
+TARGETPFX = 
+
+# Override standard paths
+HACKDIR = .
+
+# NetHack 5.0 uses a shared library for Android.
+# We include date.o here to ensure nomakedefs is defined in the library.
+WINANDROIDOBJ = androidmain.o androidunix.o ioctl.o winandroid.o date.o
+override WINOBJ = $(WINANDROIDOBJ)
+
+# Override SYSOBJ to avoid unixmain.o and unixtty.o (which requires curses)
+# This is inside the PRE section to ensure it's defined before it's used elsewhere.
+override SYSOBJ = 
+
+#-----------------------------------------------------------------------------
+# Compiler flags
+
+NHCFLAGS += -DANDROID
+# No system-wide HACKDIR on Android; each app sets its own data directory
+# at runtime via JNI before calling NetHackMain().
+NHCFLAGS += -DHACKDIR="\"$(HACKDIR)\""
+
+CFLAGS += -I../include
+CFLAGS += $(NHCFLAGS)
+CFLAGS += -fPIC -fvisibility=default
+
+# Suppress the game binary so Makefile.top does not try to link it.
+override GAME =
+
+NETHACK_SO = libnethack.so
+
+# Shared library link flags.
+SO_LFLAGS = -shared -Wl,-soname,libnethack.so
+WINLIB =
+LIBS = -lm -llog
+
+# After the normal 'pregame' step (which generates .h files and compiles
+# the core), build the shared library.
+MOREALL += ( cd src && $(MAKE) pregame && $(MAKE) $(NETHACK_SO) )
+
+#-----------------------------------------------------------------------------
+# libnethack.so link rule (injected into Makefile.src via #-POST)
+
+#-POST
+
+ifdef MAKEFILE_TOP
+android-all:
+	true; $(MOREALL)
+endif # MAKEFILE_TOP
+
+ifdef MAKEFILE_SRC
+# The shared library depends on all core and platform objects.
+# We include everything that would normally go into the executable.
+$(NETHACK_SO): $(HOBJ) $(SYSOBJ) $(WINOBJ) $(REGEXOBJ) $(TARGET_HACKLIB) \
+               ../lib/lua/liblua-$(LUA_VERSION).a
+	$(LD) $(SO_LFLAGS) -o $@ $^ $(WINLIB) $(LIBS)
+	@echo "$(NETHACK_SO) built."
+
+# Object file rules for android-specific sources
+$(TARGETPFX)androidmain.o: ../sys/android/androidmain.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ $<
+$(TARGETPFX)androidunix.o: ../sys/android/androidunix.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ $<
+$(TARGETPFX)winandroid.o: ../win/android/winandroid.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ $<
+$(TARGETPFX)ioctl.o: ../sys/share/ioctl.c $(HACK_H)
+	$(CC) $(CFLAGS) -c -o $@ $<
+endif # MAKEFILE_SRC
