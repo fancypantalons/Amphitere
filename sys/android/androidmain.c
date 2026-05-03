@@ -122,6 +122,9 @@ NetHackMain(int argc, char **argv)
 #endif
 
     initoptions();
+
+    iflags.force_invmenu = TRUE; /* Android: show yn dialogs */
+
     init_nhwindows(&argc, argv);
 
     u.uhp = 1; /* prevent RIP on early quits */
