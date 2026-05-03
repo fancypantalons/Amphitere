@@ -9,7 +9,7 @@ STATIC_DCL char *NDECL(nextmbuf);
 STATIC_DCL void FDECL(getpos_help, (BOOLEAN_P, const char *));
 STATIC_DCL int FDECL(CFDECLSPEC cmp_coord_distu, (const void *, const void *));
 STATIC_DCL boolean FDECL(gather_locs_interesting, (int, int, int));
-STATIC_DCL char *FDECL(name_from_player, (char *, const char *, const char *));
+STATIC_DCL char *FDECL(name_from_player, (char *, const char *, const char *, BOOLEAN_P));
 STATIC_DCL void FDECL(gather_locs, (coord **, int *, int));
 STATIC_DCL int FDECL(gloc_filter_floodfill_matcharea, (int, int));
 STATIC_DCL void FDECL(auto_describe, (int, int));
@@ -19,6 +19,7 @@ STATIC_DCL void FDECL(do_oname, (struct obj *));
 STATIC_PTR char *FDECL(docall_xname, (struct obj *));
 STATIC_DCL void NDECL(namefloorobj);
 STATIC_DCL char *FDECL(bogusmon, (char *,char *));
+STATIC_DCL void FDECL(docall_ext, (struct obj *, BOOLEAN_P));
 
 extern const char what_is_an_unknown_object[]; /* from pager.c */
 
@@ -683,12 +684,12 @@ const char *goal;
     }
     cx = ccp->x;
     cy = ccp->y;
-#ifdef CLIPPING
+#if defined(CLIPPING) && !defined(ANDROID)
     cliparound(cx, cy);
 #endif
     curs(WIN_MAP, cx, cy);
     flush_screen(0);
-#ifdef MAC
+#if defined(MAC) || defined(ANDROID)
     lock_mouse_cursor(TRUE);
 #endif
     for (;;) {
@@ -971,7 +972,7 @@ const char *goal;
         curs(WIN_MAP, cx, cy);
         flush_screen(0);
     }
-#ifdef MAC
+#if defined(MAC) || defined(ANDROID)
     lock_mouse_cursor(FALSE);
 #endif
     if (msg_given)
@@ -1065,12 +1066,13 @@ struct obj *obj;
 /* get a name for a monster or an object from player;
    truncate if longer than PL_PSIZ, then return it */
 static char *
-name_from_player(outbuf, prompt, defres)
+name_from_player(outbuf, prompt, defres, showlog)
 char *outbuf;       /* output buffer, assumed to be at least BUFSZ long;
                      * anything longer than PL_PSIZ will be truncated */
 const char *prompt;
 const char *defres; /* only used if EDIT_GETLIN is enabled; only useful
                      * if windowport xxx's xxx_getlin() supports that */
+boolean showlog;
 {
     outbuf[0] = '\0';
 #ifdef EDIT_GETLIN
@@ -1078,6 +1080,13 @@ const char *defres; /* only used if EDIT_GETLIN is enabled; only useful
         Strcpy(outbuf, defres); /* default response from getlin() */
 #else
     nhUse(defres);
+#endif
+#ifndef ANDROID
+    (void) showlog;
+#else
+    if(showlog)
+        and_getlin_log(prompt, outbuf);
+    else
 #endif
     getlin(prompt, outbuf);
     if (!*outbuf || *outbuf == '\033')
@@ -1188,7 +1197,7 @@ do_mname()
     Sprintf(qbuf, "What do you want to call %s?",
             distant_monnam(mtmp, ARTICLE_THE, monnambuf));
     /* use getlin() to get a name string from the player */
-    if (!name_from_player(buf, qbuf, has_mname(mtmp) ? MNAME(mtmp) : NULL))
+    if (!name_from_player(buf, qbuf, has_mname(mtmp) ? MNAME(mtmp) : NULL), 0)
         return;
 
     /* Unique monsters have their own specific names or titles.
@@ -1242,7 +1251,7 @@ register struct obj *obj;
             is_plural(obj) ? "these" : "this");
     (void) safe_qbuf(qbuf, qbuf, "?", obj, xname, simpleonames, "item");
     /* use getlin() to get a name string from the player */
-    if (!name_from_player(buf, qbuf, safe_oname(obj)))
+    if (!name_from_player(buf, qbuf, safe_oname(obj)), 0)
         return;
 
     /*
@@ -1481,7 +1490,15 @@ void
 docall(obj)
 struct obj *obj;
 {
-    char buf[BUFSZ], qbuf[QBUFSZ];
+    docall_ext(obj, TRUE);
+}
+
+void
+docall_ext(obj, showlog)
+struct obj *obj;
+boolean showlog;
+{
+    char buf[BUFSZ] = DUMMY, qbuf[QBUFSZ];
     char **str1;
 
     if (!obj->dknown)
@@ -1498,7 +1515,7 @@ struct obj *obj;
     /* pointer to old name */
     str1 = &(objects[obj->otyp].oc_uname);
     /* use getlin() to get a name string from the player */
-    if (!name_from_player(buf, qbuf, *str1))
+    if (!name_from_player(buf, qbuf, *str1, 1))
         return;
 
     /* clear old name */

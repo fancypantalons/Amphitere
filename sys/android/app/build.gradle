@@ -1,0 +1,144 @@
+plugins {
+  id 'com.android.application'
+}
+
+android {
+  namespace 'com.tbd.NetHack'
+  compileSdk 34
+  buildToolsVersion "35.0.0"
+
+  signingConfigs {
+    release {
+      storeFile file("${System.getProperty('user.home')}/.android/debug.keystore")
+      storePassword 'android'
+      keyAlias 'androiddebugkey'
+      keyPassword 'android'
+    }
+  }
+
+  defaultConfig {
+    minSdk 33
+    targetSdk 34
+    versionName '2026.05.01'
+    versionCode 20260501
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  buildTypes {
+    release {
+      debuggable false
+      signingConfig signingConfigs.release
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+
+  lint {
+    disable 'MissingClass'
+  }
+
+  packagingOptions {
+    jniLibs {
+      useLegacyPackaging = false
+    }
+  }
+
+  sourceSets {
+    main {
+      manifest.srcFile 'AndroidManifest.xml'
+      res.srcDirs = ['res']
+      assets.srcDirs = ['assets']
+      jniLibs.srcDirs = ['libs']
+    }
+    androidTest {
+      java.srcDirs = ['src/androidTest/java']
+    }
+  }
+}
+
+task buildNative(type: Exec) {
+    workingDir '..'
+    commandLine 'sh', '-c', 'sh ./setup.sh && cd ../.. && make android-all'
+}
+
+task cleanNative(type: Exec) {
+    workingDir file('../../..')
+    commandLine 'sh', '-c', 'make clean'
+    ignoreExitValue true  // Don't fail if there's nothing to clean
+}
+
+preBuild.dependsOn buildNative
+clean.dependsOn cleanNative
+
+task alignApk {
+    doLast {
+        // Dynamically resolve build tools path from Android SDK
+        def buildTools = android.sdkDirectory.toPath()
+            .resolve("build-tools")
+            .resolve(android.buildToolsVersion.toString())
+        def zipalign = buildTools.resolve("zipalign").toString()
+        def apksigner = buildTools.resolve("apksigner").toString()
+
+        def debugApk = file("build/outputs/apk/debug/app-debug.apk")
+        if (debugApk.exists()) {
+            println "Aligning ${debugApk} to 16KB pages and 4-byte general alignment..."
+            def tempApk = file("build/outputs/apk/debug/app-debug-aligned.apk")
+            // -P 16 = 16KB page alignment for .so files (requires build tools 35.0.0+)
+            // 4 = 4-byte general alignment
+            exec {
+                commandLine zipalign, "-f", "-P", "16", "4", debugApk, tempApk
+            }
+            exec {
+                commandLine apksigner, "sign", "--ks", "/home/brettk/.android/debug.keystore", "--ks-pass", "pass:android", tempApk
+            }
+            debugApk.delete()
+            tempApk.renameTo(debugApk)
+        }
+    }
+}
+
+task alignReleaseApk {
+    doLast {
+        def buildTools = android.sdkDirectory.toPath()
+            .resolve("build-tools")
+            .resolve(android.buildToolsVersion.toString())
+        def zipalign = buildTools.resolve("zipalign").toString()
+        def apksigner = buildTools.resolve("apksigner").toString()
+
+        def releaseApk = file("build/outputs/apk/release/app-release.apk")
+        if (releaseApk.exists()) {
+            println "Aligning ${releaseApk} to 16KB pages and 4-byte general alignment..."
+            def tempApk = file("build/outputs/apk/release/app-release-aligned.apk")
+            exec {
+                commandLine zipalign, "-f", "-P", "16", "4", releaseApk, tempApk
+            }
+            exec {
+                commandLine apksigner, "sign",
+                    "--ks", "${System.getProperty('user.home')}/.android/debug.keystore",
+                    "--ks-pass", "pass:android", tempApk
+            }
+            releaseApk.delete()
+            tempApk.renameTo(releaseApk)
+        }
+    }
+}
+
+// Hook it after the APK is created but before installation
+tasks.whenTaskAdded { task ->
+    if (task.name == 'packageDebug') {
+        task.finalizedBy alignApk
+    }
+    if (task.name == 'packageRelease') {
+        task.finalizedBy alignReleaseApk
+    }
+}
+
+dependencies {
+  implementation 'com.tbd.forkfront:lib:1.1'
+  testImplementation 'junit:junit:4.13.2'
+  androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+  androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}

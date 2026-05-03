@@ -1,0 +1,18 @@
+
+    NetHack version 3.6.7
+
+Options compiled into this edition:
+
+    color, end-of-game dumplogs, insurance files for recovering from
+    crashes, log file, extended log file, errors and warnings log file, news
+    file, pattern matching via :PATMATCH:, pseudo random numbers generated
+    by ISAAC64, strong PRNG seed available from /dev/urandom, restore saved
+    games via menu, screen clipping, traditional status display, status via
+    windowport with highlighting, suspend command, user sounds, save and
+    bones files accepted from versions 3.6.0 through 3.6.7, and basic
+    NetHack features.
+
+Supported windowing system:
+
+    "and" (Android).
+

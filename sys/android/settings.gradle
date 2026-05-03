@@ -1,0 +1,8 @@
+include ':app'
+rootProject.name = 'NetHack-Android'
+
+includeBuild('forkfront') {
+    dependencySubstitution {
+        substitute module("com.tbd.forkfront:lib") using project(":lib")
+    }
+}

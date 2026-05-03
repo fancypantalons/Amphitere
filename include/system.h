@@ -91,13 +91,13 @@ E int FDECL(srandom, (unsigned int));
 #endif
 #endif
 #else
-#if defined(MACOSX)
+#if defined(MACOSX) || defined(ANDROID)
 E long NDECL(lrand48);
 E void FDECL(srand48, (long));
 #else
 E long lrand48();
 E void srand48();
-#endif /* MACOSX */
+#endif /* MACOSX || ANDROID */
 #endif /* BSD || ULTRIX || RANDOM */
 
 #if !defined(BSD) || defined(ultrix)
@@ -354,10 +354,10 @@ E char *FDECL(memset, (char *, int, int));
 #if defined(BSD) && defined(ultrix) /* i.e., old versions of Ultrix */
 E void sleep();
 #endif
-#if defined(ULTRIX) || defined(SYSV)
+#if (defined(ULTRIX) || defined(SYSV)) && !defined(ANDROID)
 E unsigned sleep();
 #endif
-#if defined(HPUX)
+#if defined(HPUX) || defined(ANDROID)
 E unsigned int FDECL(sleep, (unsigned int));
 #endif
 #ifdef VMS

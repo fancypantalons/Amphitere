@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "profile": "generic",
+  "synthDiagonals": true,
+  "leftStickMovement": true,
+  "bindings": [
+    { "chord": "DPAD_LEFT",     "cmd": "h" },
+    { "chord": "DPAD_RIGHT",    "cmd": "l" },
+    { "chord": "DPAD_UP",       "cmd": "k" },
+    { "chord": "DPAD_DOWN",     "cmd": "j" },
+    { "chord": "BUTTON_A",      "cmd": "," },
+    { "chord": "BUTTON_B",      "cmd": "s" },
+    { "chord": "BUTTON_X",      "cmd": "e" },
+    { "chord": "BUTTON_Y",      "cmd": "i" },
+    { "chord": "BUTTON_START",  "ui": "OPEN_DRAWER", "locked": true },
+    { "chord": "BUTTON_SELECT", "ui": "OPEN_COMMAND_PICKER" },
+    { "chord": "L1+BUTTON_A",   "cmd": "a" },
+    { "chord": "L1+BUTTON_B",   "cmd": "w" },
+    { "chord": "L1+BUTTON_X",   "cmd": "W" },
+    { "chord": "L1+BUTTON_Y",   "cmd": "T" },
+    { "chord": "R1+DPAD_UP",    "cmd": "<" },
+    { "chord": "R1+DPAD_DOWN",  "cmd": ">" },
+    { "chord": "R1+DPAD_LEFT",  "cmd": "o" },
+    { "chord": "R1+DPAD_RIGHT", "cmd": "c" },
+    { "chord": "R1+BUTTON_A",   "cmd": "q" },
+    { "chord": "R1+BUTTON_B",   "cmd": "r" },
+    { "chord": "R1+BUTTON_X",   "cmd": "z" },
+    { "chord": "R1+BUTTON_Y",   "cmd": "Z" },
+    { "chord": "L2",            "cmd": "t" },
+    { "chord": "R2",            "cmd": "F" }
+  ]
+}

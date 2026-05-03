@@ -1,0 +1,3 @@
+[submodule "sys/android/forkfront"]
+	path = sys/android/forkfront
+	url = git@github.com:fancypantalons/ForkFront-Android-NG.git
