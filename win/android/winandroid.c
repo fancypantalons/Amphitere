@@ -658,8 +658,15 @@ static void
 and_print_glyph(winid wid, coordxy x, coordxy y,
                 const glyph_info *fg, const glyph_info *bg)
 {
-    int tile    = fg->gm.tileidx;
-    int bktile  = (bg && bg->gm.tileidx >= 0) ? bg->gm.tileidx : -1;
+    /* Unexplored cells arrive with glyph == GLYPH_UNEXPLORED (full-screen
+       redraw at display.c:1805 sends every cell, including unexplored
+       ones). The Java side treats tile == -1 as "draw nothing" so the
+       cell falls through to the background and the minimap shows it as
+       unexplored. Without this check the unexplored sprite tiles across
+       the entire map, making the dungeon look completely filled in. */
+    int tile    = glyph_is_unexplored(fg->glyph) ? -1 : fg->gm.tileidx;
+    int bktile  = (bg && !glyph_is_unexplored(bg->glyph) && bg->gm.tileidx >= 0)
+                      ? bg->gm.tileidx : -1;
     int ch      = fg->ttychar;
     int col     = fg->gm.sym.color;
     unsigned int special = fg->gm.glyphflags;
