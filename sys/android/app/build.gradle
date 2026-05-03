@@ -82,10 +82,14 @@ task buildNative(type: Exec) {
     commandLine 'sh', '-c',
         "sh sys/unix/setup.sh sys/unix/hints/android.500 && " +
         "rm -f src/*.o util/*.o && " +
-        // Build host-side tools (makedefs, dlb) with the host gcc — the
-        // cross-compiled binaries from android-all can't run on the build host.
+        // Build host-side tools (makedefs, dlb, tilemap) with the host gcc
+        // — the cross-compiled binaries from android-all can't run here.
         // -DDLB is required for util/dlb's main() to be active.
-        "make -C util CC=gcc NHCFLAGS='-DUNIX -DDLB -I../include' LFLAGS='' makedefs dlb && " +
+        // -DTILES_IN_GLYPHMAP must match the engine build so tilemap emits
+        // the populated glyphmap[] in src/tile.c.
+        "make -C util CC=gcc NHCFLAGS='-DUNIX -DDLB -DTILES_IN_GLYPHMAP -I../include' LFLAGS='' makedefs dlb tilemap && " +
+        // Generate src/tile.c from the host tilemap binary.
+        "( cd util && ./tilemap ) && " +
         // Generate the loose data files (data, rumors, oracles, ...).
         "make -C dat && " +
         // Pack the librarian payload into dat/nhdat. The file list mirrors

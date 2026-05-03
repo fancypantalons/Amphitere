@@ -42,6 +42,12 @@ void and_error(const char *, ...) __attribute__((format(printf, 1, 2), noreturn)
 #endif
 #define ANDROID_GRAPHICS        /* include Android window port */
 
+/* The Android port renders pre-rendered bitmap tiles, so it needs
+   glyphmap[].tileidx populated by the generated src/tile.c. */
+#ifndef TILES_IN_GLYPHMAP
+#define TILES_IN_GLYPHMAP
+#endif
+
 #ifdef SYSCF
 #undef SYSCF
 #endif
