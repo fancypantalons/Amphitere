@@ -1064,18 +1064,34 @@ and_yn_function(const char *question, const char *choices, char def)
     }
     allow_num = choices && strchr(choices, '#');
 
-    /* Short yes/no prompts with ≤4 choices: show a popup dialog */
-    if (iflags.force_invmenu && choices && nChoices <= 4
-        && esc < 0 && !allow_num) {
-        jbyteArray jq = create_bytearray(question);
-        jbyteArray jb = (*jEnv)->NewByteArray(jEnv, nChoices);
-        jbyte *pTmp = (*jEnv)->GetByteArrayElements(jEnv, jb, 0);
-        memcpy(pTmp, choices, (size_t) nChoices);
-        (*jEnv)->ReleaseByteArrayElements(jEnv, jb, pTmp, 0);
-        JNICallV(jYNFunction, jq, jb, def);
-        destroy_jobject(jq);
-        destroy_jobject(jb);
-        return and_nhgetch();
+    /* Short yes/no prompts with ≤4 choices: show a popup dialog.
+       Some 5.0 prompts use "\033x" to hide extra choices in the text
+       prompt (e.g. "ynq\033a").  Strip \033 for the popup — count only
+       non-escape characters and send just those to Java so the user
+       sees all options as tappable buttons. */
+    if (iflags.force_invmenu && choices && !allow_num) {
+        const char *cp;
+        int vis = 0;
+
+        for (cp = choices; *cp; cp++)
+            if (*cp != '\033')
+                vis++;
+
+        if (vis <= 4) {
+            jbyteArray jq = create_bytearray(question);
+            jbyteArray jb = (*jEnv)->NewByteArray(jEnv, vis);
+            jbyte *pTmp = (*jEnv)->GetByteArrayElements(jEnv, jb, 0);
+            int idx = 0;
+
+            for (cp = choices; *cp; cp++)
+                if (*cp != '\033')
+                    pTmp[idx++] = (jbyte) *cp;
+            (*jEnv)->ReleaseByteArrayElements(jEnv, jb, pTmp, 0);
+            JNICallV(jYNFunction, jq, jb, def);
+            destroy_jobject(jq);
+            destroy_jobject(jb);
+            return and_nhgetch();
+        }
     }
 
     if (choices) {
