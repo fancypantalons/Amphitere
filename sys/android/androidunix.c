@@ -90,7 +90,7 @@ getlock(void)
     if ((fd = open(fq_lock, 0)) >= 0) {
         (void) close(fd);
 #ifdef SELF_RECOVER
-        if (recover_savefile() && program_state.in_self_recover) {
+        if (recover_savefile()) {
             set_levelfile_name(gl.lock, 0);
             fq_lock = fqname(gl.lock, LEVELPREFIX, 0);
         } else

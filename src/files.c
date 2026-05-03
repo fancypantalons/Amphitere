@@ -1391,6 +1391,58 @@ plname_from_file(
 }
 #endif /* defined(SELECTSAVED) */
 
+#ifdef ANDROID
+/* match files whose name ends in '0' (level files for running games) */
+static int
+filter_running(const struct dirent *entry)
+{
+    const char *s = entry->d_name;
+    size_t len = strlen(s);
+
+    return (int) (len > 0 && s[len - 1] == '0');
+}
+
+/* extract player name from a level-0 lock file for a running game.
+   The 5.0 savestateinlock() format after the hackpid, savelev, and
+   savename is: indicator(1) | cscount(1) | critical_sizes(cscount)
+   | version_info | pltmpsiz | player_name.  Skip the 5.0-specific
+   header fields to reach pltmpsiz and the name. */
+static char *
+plname_from_running(const char *filename)
+{
+    int fd, savelev, hpid, pltmpsiz;
+    char indicator, file_cscount;
+    char savename[SAVESIZE];
+    struct version_info version_data;
+    char tmpplbuf[PL_NSIZ_PLUS];
+    char *result = (char *) 0;
+
+    fd = open(filename, O_RDONLY, 0);
+    if (fd < 0)
+        return (char *) 0;
+
+    if (read(fd, (genericptr_t) &hpid, sizeof hpid) == (int) sizeof hpid
+     && read(fd, (genericptr_t) &savelev, sizeof savelev) == (int) sizeof savelev
+     && read(fd, (genericptr_t) savename, sizeof savename) == (int) sizeof savename
+     && read(fd, (genericptr_t) &indicator, sizeof indicator) == (int) sizeof indicator
+     && read(fd, (genericptr_t) &file_cscount, sizeof file_cscount) == (int) sizeof file_cscount) {
+        /* skip critical sizes (file_cscount bytes) */
+        if (lseek(fd, (off_t) (unsigned char) file_cscount, SEEK_CUR) >= 0
+         && read(fd, (genericptr_t) &version_data,
+                 sizeof version_data) == (int) sizeof version_data
+         && read(fd, (genericptr_t) &pltmpsiz,
+                 sizeof pltmpsiz) == (int) sizeof pltmpsiz
+         && pltmpsiz > 0 && pltmpsiz <= PL_NSIZ_PLUS
+         && read(fd, (genericptr_t) &tmpplbuf,
+                 (unsigned) pltmpsiz) == pltmpsiz) {
+            result = dupstr(tmpplbuf);
+        }
+    }
+    (void) close(fd);
+    return result;
+}
+#endif /* ANDROID */
+
 #define SUPPRESS_WAITSYNCH_PERFILE TRUE
 #define ALLOW_WAITSYNCH_PERFILE FALSE
 
@@ -1502,6 +1554,10 @@ get_saved_games(void)
                 if (!entry)
                     break;
                 if (sscanf(entry->d_name, "%d%63s", &uid, name) == 2) {
+#ifdef ANDROID
+                    if (strchr(entry->d_name, '.'))
+                        continue;
+#endif
                     if (uid == myuid) {
                         char filename[BUFSZ];
                         char *r;
@@ -1518,6 +1574,63 @@ get_saved_games(void)
         }
     }
 #endif /* UNIX */
+#ifdef ANDROID
+    {
+        int myuid = getuid();
+        struct dirent **namelist;
+        struct dirent **namelist2;
+        int n1 = scandir(fqname("save", SAVEPREFIX, 0),
+                         &namelist, (void *) 0, (void *) 0);
+        int n2 = scandir(".", &namelist2, filter_running, (void *) 0);
+        int i, uid;
+        char name[64];
+
+        if (n1 < 0) n1 = 0;
+        if (n2 < 0) n2 = 0;
+        if (n1 > 0 || n2 > 0) {
+            if (result)
+                free_saved_games(result);
+            result = (char **) alloc((unsigned) (n1 + n2 + 1)
+                                    * sizeof (char *));
+            (void) memset((genericptr_t) result, 0,
+                          (n1 + n2 + 1) * sizeof (char *));
+            j = 0;
+        }
+        for (i = 0; i < n1; i++) {
+            if (strchr(namelist[i]->d_name, '.'))
+                continue;
+            if (sscanf(namelist[i]->d_name, "%d%63s", &uid, name) == 2) {
+                if (uid == myuid) {
+                    char filename[BUFSZ];
+                    char *r;
+
+                    Sprintf(filename, "save/%d%s", uid, name);
+                    r = plname_from_file(filename,
+                                         ALLOW_WAITSYNCH_PERFILE);
+                    if (r)
+                        result[j++] = r;
+                }
+            }
+        }
+        for (i = 0; i < n2; i++) {
+            if (sscanf(namelist2[i]->d_name, "%d%63[^.].0", &uid, name) == 2) {
+                if (uid == myuid) {
+                    char *r;
+
+                    r = plname_from_running(namelist2[i]->d_name);
+                    if (r)
+                        result[j++] = r;
+                }
+            }
+        }
+        for (i = 0; i < n1; i++)
+            free((genericptr_t) namelist[i]);
+        free((genericptr_t) namelist);
+        for (i = 0; i < n2; i++)
+            free((genericptr_t) namelist2[i]);
+        free((genericptr_t) namelist2);
+    }
+#endif /* ANDROID */
 #ifdef VMS
     Strcpy(svp.plname, "*");
     set_savefile_name(FALSE);
