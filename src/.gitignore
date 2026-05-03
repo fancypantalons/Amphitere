@@ -4,6 +4,7 @@ monstr.c
 hack.h-t
 tile.c
 Sysunix
+Sysandroid
 nethack
 *.o
 tiles.bmp
