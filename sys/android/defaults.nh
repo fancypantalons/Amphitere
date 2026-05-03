@@ -38,7 +38,7 @@ OPTIONS=!autopickup
 
 OPTIONS=lit_corridor,showexp,time,toptenwin
 OPTIONS=pile_limit:2,hilite_pile,hilite_pet
-OPTIONS=DECgraphics,runmode:walk
+OPTIONS=IBMgraphics,runmode:walk
 OPTIONS=boulder:0
 #OPTIONS=!force_invmenu
 
