@@ -716,7 +716,8 @@ and_add_menu(winid wid, const glyph_info *gi, const ANY_P *ident,
              char accelerator, char groupacc, int attr, int clr UNUSED,
              const char *str, unsigned int itemflags)
 {
-    int tile = (gi && gi->gm.tileidx >= 0) ? gi->gm.tileidx : -1;
+    int tile = (gi && gi->glyph != NO_GLYPH && gi->gm.tileidx >= 0)
+                   ? gi->gm.tileidx : -1;
     boolean preselected = (itemflags & MENU_ITEMFLAGS_SELECTED) != 0;
 
     if (attr)
