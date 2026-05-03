@@ -14,6 +14,7 @@ static jmp_buf nethack_exit_jmp;
 
 static void process_options(int, char **);
 static void wd_message(void);
+boolean whoami(void);
 
 /* Called by nethack_exit() / nh_terminate() to return control to JNI */
 void
@@ -78,8 +79,10 @@ NetHackMain(int argc, char **argv)
     NHFILE *nhfp;
     boolean resuming = FALSE;
     boolean plsel_once = FALSE;
+    boolean exact_username;
     int jmpval;
     FILE *fp;
+    char *dir = NULL;
 
     jmpval = setjmp(nethack_exit_jmp);
     if (jmpval) {
@@ -103,6 +106,21 @@ NetHackMain(int argc, char **argv)
         fclose(fp);
 
     choose_windows(DEFAULT_WINDOW_SYS);
+
+#ifdef CHDIR
+    dir = nh_getenv("NETHACKDIR");
+    if (!dir)
+        dir = nh_getenv("HACKDIR");
+#endif
+
+    program_state.early_options = 1;
+    early_options(&argc, &argv, &dir);
+    program_state.early_options = 0;
+
+#ifdef CHDIR
+    chdirx(dir, TRUE);
+#endif
+
     initoptions();
     init_nhwindows(&argc, argv);
 
@@ -111,7 +129,13 @@ NetHackMain(int argc, char **argv)
     process_options(argc, argv);
 
     set_playmode();
-    gp.plnamelen = 0;
+
+    if (wizard) {
+        gl.locknum = 0;
+    }
+
+    exact_username = whoami();
+    gp.plnamelen = exact_username ? (int) strlen(svp.plname) : 0;
     plnamesuffix(); /* strips suffix; calls askname() if plname[] empty */
 
     dlb_init(); /* must be before newgame() */
@@ -316,15 +340,35 @@ whoami(void)
     return FALSE;
 }
 
-/* generate/retrieve unique instance ID */
+/* generate/retrieve unique instance ID, persisted across sessions */
 void
 get_nhuuid(void)
 {
-    /* Placeholder for Android - ideally this would use Android's
-       unique ID or generate a random one and save it. */
-    if (!svn.nhuuid[0]) {
-        Snprintf(svn.nhuuid, sizeof svn.nhuuid, "android-session-%08lx",
-                 sys_random_seed());
+    FILE *fp;
+
+    if (svn.nhuuid[0])
+        return;
+
+    fp = fopen("nhuuid", "r");
+    if (fp) {
+        if (fgets(svn.nhuuid, (int) sizeof svn.nhuuid, fp)) {
+            char *nl = strchr(svn.nhuuid, '\n');
+
+            if (nl)
+                *nl = '\0';
+        }
+        (void) fclose(fp);
+        if (svn.nhuuid[0])
+            return;
+    }
+
+    Snprintf(svn.nhuuid, sizeof svn.nhuuid, "android-%08lx-%08lx",
+             sys_random_seed(), (unsigned long) time((time_t *) 0));
+
+    fp = fopen("nhuuid", "w");
+    if (fp) {
+        fprintf(fp, "%s\n", svn.nhuuid);
+        (void) fclose(fp);
     }
 }
 
