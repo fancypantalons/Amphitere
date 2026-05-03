@@ -59,15 +59,41 @@ android {
   }
 }
 
+// NDK config: read from sys/android/local.properties, then env, then default path.
+def localProps = new Properties()
+def localPropsFile = file("${rootDir}/local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.withInputStream { localProps.load(it) }
+}
+def ndkRoot = localProps.getProperty('ndk.dir')
+    ?: System.getenv('ANDROID_NDK_ROOT')
+    ?: "/home/brettk/Android/Sdk/ndk/21.4.7075529"
+def androidAbi = localProps.getProperty('android.abi') ?: 'arm64-v8a'
+
 task buildNative(type: Exec) {
     workingDir '..'
-    commandLine 'sh', '-c', 'sh ./setup.sh && cd ../.. && make android-all'
+    environment 'ANDROID_NDK_ROOT', ndkRoot
+    environment 'ANDROID_ABI', androidAbi
+
+    doFirst {
+        // Defensive asset management: clean out stale assets before building
+        file("assets/nethackdir").deleteDir()
+        file("assets/nethackdir").mkdirs()
+    }
+
+    commandLine 'sh', '-c', """
+        # Auto-setup if Makefiles are missing
+        [ -f ../../Makefile ] || sh ./setup.sh
+        
+        # Build native components with the resolved NDK and ABI
+        cd ../.. && make android-all NDK=${ndkRoot} ABI=${androidAbi}
+    """
 }
 
 task cleanNative(type: Exec) {
     workingDir file('../../..')
-    commandLine 'sh', '-c', 'make clean'
-    ignoreExitValue true  // Don't fail if there's nothing to clean
+    commandLine 'sh', '-c', '[ -f Makefile ] && make clean || true'
+    ignoreExitValue true
 }
 
 preBuild.dependsOn buildNative
