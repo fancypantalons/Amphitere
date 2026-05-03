@@ -2500,7 +2500,7 @@ fopen_wizkit_file(void)
 #endif
     }
 
-#if defined(MICRO) || defined(MACOS9) || defined(__BEOS__) || defined(WIN32)
+#if defined(MICRO) || defined(MACOS9) || defined(__BEOS__) || defined(WIN32) || defined(ANDROID)
     if ((fp = fopen(fqname(gw.wizkit, CONFIGPREFIX, 0), "r")) != (FILE *) 0)
         return fp;
 #else
