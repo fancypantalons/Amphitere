@@ -80,8 +80,8 @@ task buildNative(type: Exec) {
         file("libs/${androidAbi}").mkdirs()
     }
     commandLine 'sh', '-c',
-        "sh sys/unix/setup.sh sys/unix/hints/android.500 && " +
-        "rm -f src/*.o util/*.o && " +
+        "[ -f src/Makefile ] || sh sys/unix/setup.sh sys/unix/hints/android.500 && " +
+        "rm -f src/monst.o src/objects.o src/date.o src/alloc.o src/dlb.o src/drawing.o src/hacklib.o src/hacklib.a && " +
         // Build host-side tools (makedefs, dlb, tilemap) with the host gcc
         // — the cross-compiled binaries from android-all can't run here.
         // -DDLB is required for util/dlb's main() to be active.
@@ -104,7 +104,7 @@ task buildNative(type: Exec) {
             "astral.lua air.lua earth.lua fire.lua water.lua hellfill.lua tut-?.lua " +
             "???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua " +
             "bogusmon data engrave epitaph oracles options quest.lua rumors ) && " +
-        "rm -f src/*.o util/*.o && " +
+        "rm -f src/monst.o src/objects.o src/date.o src/alloc.o src/dlb.o src/drawing.o src/hacklib.o src/hacklib.a util/*.o && " +
         // Cross-compile the engine shared library.
         "make android-all && " +
         "cp src/libnethack.so sys/android/app/libs/${androidAbi}/libnethack.so && " +
