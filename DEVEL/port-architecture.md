@@ -4,7 +4,7 @@ This document provides a detailed overview of the NetHack Android port's archite
 
 ## 1. Architectural Philosophy: The Clean Overlay
 The port follows a **Clean Overlay** strategy. This means:
-*   The core NetHack source tree (`src/`, `include/`, `dat/`, etc.) remains identical to the vanilla 3.6.7 release.
+*   The core NetHack source tree (`src/`, `include/`, `dat/`, etc.) remains identical to the vanilla 5.0.0 release.
 *   All Android-specific logic is contained within the `sys/android/` directory.
 *   The port interacts with the engine via the standard NetHack `window_procs` interface, avoiding invasive changes to the game logic.
 

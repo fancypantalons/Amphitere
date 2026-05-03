@@ -1,4 +1,4 @@
-This project is a modernized Android port of NetHack 3.6.7, following a "thick native, thin wrapper" architectural model.
+This project is a modernized Android port of NetHack 5.0.0, following a "thick native, thin wrapper" architectural model.
 
 # Core Design Principles
 
@@ -8,7 +8,7 @@ When making architectural or UI decisions, adhere to these guiding principles:
 - **Native Android Experience**: Avoid "PC-to-Android" ports that rely on virtual cursors or keyboard emulation. The UI should feel native, using Android-appropriate gestures, haptics, and layout patterns (inspired by the philosophy of NetHackDS).
 - **Full screen and immersive**: The original version of those port made these features optional, but this is a game. Fullscreen and immersive just makes sense.
 - **Radical Configurability**: NetHack's complexity is extreme. The interface must be highly flexible and configurable to accommodate diverse playstyles rather than enforcing a single "correct" control scheme.
-- **Modern Performance**: Target modern Android features (like 16KB page alignment) while maintaining the core stability of the NetHack 3.6.7 engine.
+- **Modern Performance**: Target modern Android features (like 16KB page alignment) while maintaining the core stability of the NetHack 5.0.0 engine.
 
 # Architectural Quick Reference
 

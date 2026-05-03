@@ -1,6 +1,6 @@
 # Building the NetHack Android Port
 
-This document outlines the requirements and steps to build the modernized Android port of NetHack 3.6.7.
+This document outlines the requirements and steps to build the modernized Android port of NetHack 5.0.0.
 
 ## 1. Prerequisites
 

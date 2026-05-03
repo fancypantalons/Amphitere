@@ -1,6 +1,6 @@
 # NetHack Android DS
 
-A modernized Android port of [NetHack 3.6.7](https://www.nethack.org/), built for touchscreens and
+A modernized Android port of [NetHack 5.0.0](https://www.nethack.org/), built for touchscreens and
 physical gamepads. This is a personal, in-development project — expect rough edges, but also expect
 it to keep getting better.
 
@@ -55,7 +55,7 @@ https://github.com/user-attachments/assets/9ae8ba2b-7f65-4efd-8f7e-309b227151b7
 
 The port follows a **thick native, thin wrapper** model:
 
-- The vanilla NetHack 3.6.7 engine compiles to a native shared library (`libnethack.so`) via the
+- The vanilla NetHack 5.0.0 engine compiles to a native shared library (`libnethack.so`) via the
   Android NDK. The core game logic is untouched.
 - A thin JNI bridge (`sys/android/winandroid.c`) connects the engine to the Java UI layer by
   implementing NetHack's standard `window_procs` interface.
@@ -89,7 +89,7 @@ See [`DEVEL/android-port-build.md`](DEVEL/android-port-build.md) for full setup 
 ## Origins
 
 This project is a hard fork of [NetHack-Android](https://github.com/gurrhack/NetHack-Android) by
-gurrhack, which provided the original native bridge and build system for NetHack 3.6.7 on Android.
+gurrhack, which provided the original native bridge and build system for NetHack 5.0.0 on Android.
 The UI library, [ForkFront](sys/android/forkfront/README.md), is similarly a hard fork of gurrhack's
 [ForkFront-Android](https://github.com/gurrhack/ForkFront-Android). Both forks diverge substantially
 in architecture and design philosophy, and while it could not exist without all that previous hard work, I've opted to deviate pretty substantially without a focus on contributing back to the original (now fairly quiet) project.

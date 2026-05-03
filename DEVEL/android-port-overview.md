@@ -1,9 +1,9 @@
-# NetHack 3.6.7 Android Port Analysis
+# NetHack 5.0.0 Android Port Analysis
 
-This document describes the architectural integration of the Android port within the NetHack 3.6.7 codebase.
+This document describes the architectural integration of the Android port within the NetHack 5.0.0 codebase.
 
 ## 1. Architectural Overview
-The Android port follows a "thick native, thin wrapper" model. The core NetHack engine (version 3.6.7) is compiled as a native shared library (`libnethack.so`), which is then managed by a Java-based Android application. The UI is implemented by delegating NetHack's windowing system calls to the Java layer via JNI.
+The Android port follows a "thick native, thin wrapper" model. The core NetHack engine (version 5.0.0) is compiled as a native shared library (`libnethack.so`), which is then managed by a Java-based Android application. The UI is implemented by delegating NetHack's windowing system calls to the Java layer via JNI.
 
 ## 2. Overlay Structure
 The port is implemented as an "overlay" on the vanilla NetHack source. The primary additions are located in the `sys/android/` directory, while standard NetHack configuration files are modified to recognize the Android platform.
@@ -40,4 +40,4 @@ The build process integrates traditional NetHack Makefiles with the Android NDK 
 4.  **APK Packaging**: Gradle is used to compile the Android project and package the native library and assets into the final APK.
 
 ## 5. Summary of Porting Strategy
-The port avoids invasive changes to the core NetHack logic by concentrating platform-specific code in the `sys/android` directory and using the established `window_procs` abstraction. By treating the Android UI as a separate entity communicating via JNI, the port maintains high compatibility with the 3.6.7 codebase while providing a native Android experience.
+The port avoids invasive changes to the core NetHack logic by concentrating platform-specific code in the `sys/android` directory and using the established `window_procs` abstraction. By treating the Android UI as a separate entity communicating via JNI, the port maintains high compatibility with the 5.0.0 codebase while providing a native Android experience.
