@@ -1,6 +1,6 @@
-# NetHack 3.6.7 Android Port Analysis
+# Amphitere Classic Port Analysis
 
-This document describes the architectural integration of the Android port within the NetHack 3.6.7 codebase.
+This document describes the architectural integration of the Amphitere Classic port within the NetHack 3.6.7 codebase.
 
 ## 1. Architectural Overview
 The Android port follows a "thick native, thin wrapper" model. The core NetHack engine (version 3.6.7) is compiled as a native shared library (`libnethack.so`), which is then managed by a Java-based Android application. The UI is implemented by delegating NetHack's windowing system calls to the Java layer via JNI.
