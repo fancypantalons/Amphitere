@@ -4,6 +4,8 @@ A modernized Android port of [NetHack 3.6.7](https://www.nethack.org/), built fo
 physical gamepads. This is a personal, in-development project — expect rough edges, but also expect
 it to keep getting better.
 
+This project wouldn't exist if not for the [gurrhack Nethack-Android port](https://github.com/gurrhack/NetHack-Android/) so first and foremost, all credit goes to Martin Gurr and his many contributors. This project wouldn't exist if not for their efforts.
+
 Releases (APK downloads) are posted on the
 [GitHub releases page](https://github.com/fancypantalons/Amphitere/releases).
 
