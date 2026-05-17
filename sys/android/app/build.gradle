@@ -20,8 +20,8 @@ android {
     applicationId 'ca.b_ark.amphitere.classic'
     minSdk 33
     targetSdk 34
-    versionName '2026.05.01'
-    versionCode 20260501
+    versionName '3.6.7-1'
+    versionCode 3060701
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
   }
 
