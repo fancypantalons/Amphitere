@@ -109,6 +109,10 @@ task buildNative(type: Exec) {
             "???-goal.lua ???-fil?.lua ???-loca.lua ???-strt.lua " +
             "bogusmon data engrave epitaph oracles options quest.lua rumors ) && " +
         "rm -f src/monst.o src/objects.o src/date.o src/alloc.o src/dlb.o src/drawing.o src/hacklib.o src/hacklib.a util/*.o && " +
+        // Wipe the host-compiled Lua (objects + archives) so make android-all
+        // recompiles it for aarch64 with the NDK clang instead of re-archiving
+        // the x86-64 host objects into a wrongly-targeted library.
+        "rm -f lib/lua-*/src/*.o lib/lua-*/src/liblua.a lib/lua/liblua-*.a && " +
         // Cross-compile the engine shared library.
         "make android-all && " +
         "cp src/libnethack.so sys/android/app/libs/${androidAbi}/libnethack.so && " +
