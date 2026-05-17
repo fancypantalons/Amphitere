@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="namespace">ca.b_ark.amphitere</string>
+	<color name="icon_background">#1a1a1a</color>
 	<string name="oldActivityName">NetHack</string>
 	<string name="nativeDataDir">nethackdir</string>
 	<string name="libraryName">nethack</string>
