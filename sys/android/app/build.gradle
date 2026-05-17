@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-  namespace 'com.tbd.NetHack'
+  namespace 'ca.b_ark.amphitere'
   compileSdk 34
   buildToolsVersion "35.0.0"
 
@@ -17,6 +17,7 @@ android {
   }
 
   defaultConfig {
+    applicationId 'ca.b_ark.amphitere'
     minSdk 33
     targetSdk 34
     versionName '2026.05.01'
