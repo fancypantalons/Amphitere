@@ -1,68 +1,85 @@
-# Building the NetHack Android Port
+# Building the Amphitere Android Port (NetHack 5.0.0)
 
-This document outlines the requirements and steps to build the modernized Android port of NetHack 5.0.0.
+## Prerequisites
 
-## 1. Prerequisites
+- **Linux** (64-bit; instructions verified on Debian/Ubuntu)
+- **JDK 17**
+- **Android SDK** with `platforms;android-34` and `build-tools;35.0.0`
+- **Android NDK** `21.4.7075529` (via `sdkmanager`: `ndk;21.4.7075529`)
+- **Host build tools**: `gcc`, `make`, `bison`, `flex`
 
-### Software Dependencies
-*   **Operating System**: Linux (instructions verified on 64-bit Ubuntu).
-*   **JDK 17**: Required by the modernized Gradle build system.
-*   **Android SDK**: Command-line tools and platforms.
-*   **Android NDK**: Version `21.4.7075529`.
-*   **Native Build Tools**: `gcc`, `make`, `bison`, `flex`, and `gcc-multilib`.
+## One-time setup
 
-### Environment Variables
-*   `ANDROID_HOME` or `ANDROID_SDK_ROOT`: Should point to your Android SDK installation.
-*   `ANDROID_NDK_ROOT`: (Optional) Points to your NDK if not in the default SDK location.
+These steps are required once per fresh checkout, and again any time you switch from another branch (e.g. the 3.6.7 port) which may have left stale Makefiles behind.
 
-## 2. Preparation Steps
+### 1. Configure the NDK
 
-### Install Android Build Tools
-Ensure the following components are installed via `sdkmanager`:
-*   `platforms;android-34`
-*   `ndk;21.4.7075529`
+Create or update `sys/android/local.properties`:
 
-### Configuring the NDK Path
-The build system automatically looks for the NDK in standard locations. If your NDK is installed in a non-standard path, set the `ANDROID_NDK_ROOT` environment variable or update the `NDK` variable in `sys/android/Makefile.src`.
+```
+sdk.dir=/path/to/Android/Sdk
+ndk.dir=/path/to/Android/Sdk/ndk/21.4.7075529
+```
 
-## 3. Build Process
+Alternatively, export `ANDROID_NDK_ROOT` before building. The build will fail with a clear error if neither is set.
 
-The build process is now fully automated. The native NetHack engine and data files are automatically compiled and packaged as part of the Gradle build.
+To target a specific ABI or API level (optional; defaults shown):
 
-1.  **Navigate to the Android project directory**:
-    ```bash
-    cd sys/android
-    ```
+```
+android.abi=arm64-v8a
+android.platform=21
+```
 
-2.  **Build the APK**:
-    ```bash
-    ./gradlew assembleDebug
-    ```
-    *This single command will:*
-    *   Initialize the NetHack build environment (`setup.sh`).
-    *   Compile the native engine for all supported ABIs (`arm64-v8a`, `armeabi-v7a`, `x86_64`).
-    *   Compile the game data (dungeons, rumors, etc.).
-    *   Package everything into a debug APK.
+### 2. Clear stale Makefiles (required when switching branches)
 
-3.  **Output Locations**:
-    The resulting APKs are located in:
-    *   Debug: `sys/android/app/build/outputs/apk/debug/app-debug.apk`
-    *   Release: `sys/android/app/build/outputs/apk/release/app-release-unsigned.apk`
+```bash
+rm -f Makefile src/Makefile dat/Makefile util/Makefile doc/Makefile
+```
 
-## 4. Supported Architectures
-The build generates shared libraries for the following ABIs by default:
-*   `arm64-v8a` (Modern 64-bit ARM devices)
-*   `armeabi-v7a` (Older 32-bit ARM devices)
-*   `x86_64` (Modern Android Emulators)
+### 3. Generate the build system
 
-To modify the target ABIs, edit the `ALL_ABIS` variable in `sys/android/Makefile.src`.
+From the repo root:
 
-## 5. Deployment
-1.  Locate the APK in `sys/android/app/build/outputs/apk/debug`.
-2.  Copy the APK file to your device or emulator.
-3.  Install and run.
+```bash
+sh sys/unix/setup.sh sys/unix/hints/android.500
+```
 
-## 6. Troubleshooting
-*   **NDK Errors**: If the build fails with "compiler not found", ensure NDK `21.4.7075529` is installed and the path in `sys/android/Makefile.src` is correct.
-*   **Java Errors**: Ensure `JAVA_HOME` points to JDK 17 or higher.
-*   **Makedefs Conflicts**: If `makedefs` fails to build on the host, check `include/system.h` for conflicting function prototypes (e.g., `sleep`, `srand48`).
+### 4. Fetch Lua
+
+From the repo root:
+
+```bash
+make fetch-lua
+```
+
+This downloads and does an initial host compile of Lua 5.4. The Gradle build will wipe the host objects and recompile Lua for the Android target automatically.
+
+## Building
+
+From `sys/android/`:
+
+```bash
+./gradlew assembleDebug       # build only
+./gradlew installDebug        # build and install to a connected device
+```
+
+The Gradle build orchestrates the full pipeline:
+1. Runs `setup.sh` if `src/Makefile` is absent (skipped on incremental builds)
+2. Builds host-side tools (`makedefs`, `dlb`, `tilemap`) with host `gcc`
+3. Generates `src/tile.c` (the glyph→tile index table) via `tilemap`
+4. Generates and packs game data into `dat/nhdat` via `dlb`
+5. Wipes host Lua objects and recompiles Lua for the Android target with the NDK clang
+6. Cross-compiles `libnethack.so` for `arm64-v8a` (or the configured ABI)
+7. Copies the `.so` and data assets into the APK
+
+Output APK: `sys/android/app/build/outputs/apk/debug/app-debug.apk`
+
+## Troubleshooting
+
+**NDK not found**: Set `ndk.dir` in `local.properties` or export `ANDROID_NDK_ROOT`.
+
+**Makefile errors after a branch switch**: You likely have stale Makefiles from the other port. Delete them (step 2 above) and re-run setup.
+
+**Lua linker error** (`File in wrong format` / `EM: 62`): The host-compiled Lua objects were not cleaned before the Android link step. Run `make clean` from the repo root, then rebuild.
+
+**`makedefs` build errors**: Ensure `gcc` and `gcc-multilib` are installed for the host build tools step.
