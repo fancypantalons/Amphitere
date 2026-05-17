@@ -59,15 +59,18 @@ android {
   }
 }
 
-// NDK config: read from sys/android/local.properties, then env, then default path.
+// NDK config: read from local.properties, then ANDROID_NDK_ROOT env var.
 def localProps = new Properties()
 def localPropsFile = file("${rootDir}/local.properties")
 if (localPropsFile.exists()) {
     localPropsFile.withInputStream { localProps.load(it) }
 }
-def ndkRoot = localProps.getProperty('ndk.dir')
-    ?: System.getenv('ANDROID_NDK_ROOT')
-    ?: "/home/brettk/Android/Sdk/ndk/21.4.7075529"
+def ndkRoot = localProps.getProperty('ndk.dir') ?: System.getenv('ANDROID_NDK_ROOT')
+if (!ndkRoot) {
+    throw new GradleException(
+        "NDK not found. Set ndk.dir in local.properties or export ANDROID_NDK_ROOT."
+    )
+}
 def androidAbi = localProps.getProperty('android.abi') ?: 'arm64-v8a'
 
 task buildNative(type: Exec) {
@@ -75,17 +78,8 @@ task buildNative(type: Exec) {
     environment 'ANDROID_NDK_ROOT', ndkRoot
     environment 'ANDROID_ABI', androidAbi
 
-    doFirst {
-        // Defensive asset management: clean out stale assets before building
-        file("assets/nethackdir").deleteDir()
-        file("assets/nethackdir").mkdirs()
-    }
-
     commandLine 'sh', '-c', """
-        # Auto-setup if Makefiles are missing
         [ -f ../../Makefile ] || sh ./setup.sh
-        
-        # Build native components with the resolved NDK and ABI
         cd ../.. && make android-all NDK=${ndkRoot} ABI=${androidAbi}
     """
 }
