@@ -1,4 +1,4 @@
-package com.tbd.NetHack;
+package ca.b_ark.amphitere;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class SmokeTest {
-    private static final String TAG = "NetHackSmokeTest";
+    private static final String TAG = "AmphitereSmokeTest";
 
     @Test
     public void testLibraryLoading() {
