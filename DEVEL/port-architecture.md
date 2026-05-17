@@ -1,6 +1,6 @@
-# NetHack Android Port Architecture
+# Amphitere Port Architecture
 
-This document provides a detailed overview of the NetHack Android port's architecture, designed to guide developers and AI agents in navigating and modifying the codebase.
+This document provides a detailed overview of the Amphitere port's architecture, designed to guide developers and AI agents in navigating and modifying the codebase.
 
 ## 1. Architectural Philosophy: The Clean Overlay
 The port follows a **Clean Overlay** strategy. This means:
@@ -11,7 +11,7 @@ The port follows a **Clean Overlay** strategy. This means:
 ## 2. Repository Structure
 The project is split across two primary components:
 
-### A. NetHack-Android (The Host)
+### A. Amphitere (The Host)
 *   **Role**: Contains the NetHack engine, the native bridge, and the Android application shell.
 *   **Key Locations**:
     *   `src/`, `include/`: Vanilla NetHack engine.

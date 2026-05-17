@@ -1,4 +1,4 @@
-This project is a modernized Android port of NetHack 5.0.0, following a "thick native, thin wrapper" architectural model.
+This project is Amphitere, a modernized Android port of NetHack 5.0.0, following a "thick native, thin wrapper" architectural model.
 
 # Core Design Principles
 
@@ -63,7 +63,7 @@ adb install -r sys/android/app/build/outputs/apk/debug/app-debug.apk
 ## Running & Testing
 To launch the application on a connected device:
 ```bash
-adb shell am start -n com.tbd.NetHack/com.tbd.forkfront.ForkFront
+adb shell am start -n ca.b_ark.amphitere/com.tbd.forkfront.ForkFront
 ```
 
 - **Emulators**: Use `x86_64` images for best performance.

@@ -1,4 +1,4 @@
-# Contributing to NetHack Android DS
+# Contributing to Amphitere
 
 Thank you for your interest in contributing. This guide covers what you need to know before
 submitting a pull request.

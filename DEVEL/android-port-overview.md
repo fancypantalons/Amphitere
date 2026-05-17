@@ -1,6 +1,6 @@
-# NetHack 5.0.0 Android Port Analysis
+# Amphitere Port Analysis
 
-This document describes the architectural integration of the Android port within the NetHack 5.0.0 codebase.
+This document describes the architectural integration of the Amphitere port within the NetHack 5.0.0 codebase.
 
 ## 1. Architectural Overview
 The Android port follows a "thick native, thin wrapper" model. The core NetHack engine (version 5.0.0) is compiled as a native shared library (`libnethack.so`), which is then managed by a Java-based Android application. The UI is implemented by delegating NetHack's windowing system calls to the Java layer via JNI.

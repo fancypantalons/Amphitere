@@ -1,11 +1,11 @@
-# NetHack Android DS
+# Amphitere
 
 A modernized Android port of [NetHack 5.0.0](https://www.nethack.org/), built for touchscreens and
 physical gamepads. This is a personal, in-development project — expect rough edges, but also expect
 it to keep getting better.
 
 Releases (APK downloads) are posted on the
-[GitHub releases page](https://github.com/fancypantalons/NetHack-Android-DS/releases).
+[GitHub releases page](https://github.com/fancypantalons/Amphitere/releases).
 
 **Requires Android 13 or later.**
 
